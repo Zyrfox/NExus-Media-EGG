@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -13,9 +13,11 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
+          // Update request cookies for downstream handlers
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
+          // Update response cookies for the browser
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
@@ -25,31 +27,29 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  // Refresh session — must call getUser() to refresh
+  // IMPORTANT: refreshes the session token if expired
   const { data: { user } } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
 
-  // Unauthenticated → redirect to login (except auth routes)
-  if (!user && !pathname.startsWith('/login') && !pathname.startsWith('/api/auth')) {
+  const isPublic =
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.includes('.')
+
+  // Unauthenticated → login
+  if (!user && !isPublic) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    const redirectResponse = NextResponse.redirect(url)
-    supabaseResponse.cookies.getAll().forEach(cookie => {
-      redirectResponse.cookies.set(cookie)
-    })
-    return redirectResponse
+    return NextResponse.redirect(url)
   }
 
-  // Authenticated → redirect away from login
-  if (user && pathname.startsWith('/login')) {
+  // Authenticated on login page → dashboard
+  if (user && pathname === '/login') {
     const url = request.nextUrl.clone()
     url.pathname = '/'
-    const redirectResponse = NextResponse.redirect(url)
-    supabaseResponse.cookies.getAll().forEach(cookie => {
-      redirectResponse.cookies.set(cookie)
-    })
-    return redirectResponse
+    return NextResponse.redirect(url)
   }
 
   return supabaseResponse
