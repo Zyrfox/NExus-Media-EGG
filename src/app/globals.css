@@ -1,0 +1,164 @@
+/* ── Google Fonts (must be first) ── */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Outfit:wght@200;300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ═══════════════════════════════════════════
+   NEXUS MEDIA — DESIGN TOKENS (Tailwind v4)
+═══════════════════════════════════════════ */
+@theme inline {
+  /* Backgrounds */
+  --color-bg:       #0c0c0a;
+  --color-bg-2:     #111109;
+
+  /* Surfaces */
+  --color-s-1:      #141410;
+  --color-s-2:      #1a1a15;
+  --color-s-3:      #1f1f19;
+  --color-s-4:      #252520;
+
+  /* Borders */
+  --color-b-1:      #222220;
+  --color-b-2:      #2e2e28;
+  --color-b-3:      #3a3a32;
+
+  /* Gold accent */
+  --color-gold:     #c9a84c;
+  --color-gold-2:   #e8c86a;
+  --color-gold-3:   #f5dfa0;
+
+  /* Text */
+  --color-tx:       #e8e6df;
+  --color-tx-2:     #a09a8e;
+  --color-tx-3:     #5a5650;
+  --color-tx-4:     #2e2e28;
+
+  /* Status colors */
+  --color-status-green:  #4caf7a;
+  --color-status-red:    #c9504c;
+  --color-status-blue:   #4c7ac9;
+  --color-status-amber:  #c9904c;
+  --color-status-purple: #9c6cc9;
+
+  /* shadcn semantic tokens → dark luxury theme */
+  --color-background:         var(--color-bg);
+  --color-foreground:         var(--color-tx);
+  --color-card:               var(--color-s-1);
+  --color-card-foreground:    var(--color-tx);
+  --color-popover:            var(--color-s-2);
+  --color-popover-foreground: var(--color-tx);
+  --color-primary:            var(--color-gold);
+  --color-primary-foreground: #0c0c0a;
+  --color-secondary:          var(--color-s-3);
+  --color-secondary-foreground: var(--color-tx-2);
+  --color-muted:              var(--color-s-2);
+  --color-muted-foreground:   var(--color-tx-3);
+  --color-accent:             rgba(201,168,76,0.08);
+  --color-accent-foreground:  var(--color-gold);
+  --color-destructive:        var(--color-status-red);
+  --color-border:             var(--color-b-1);
+  --color-input:              var(--color-b-1);
+  --color-ring:               rgba(201,168,76,0.4);
+  --radius:                   0.5rem;
+
+  /* Fonts */
+  --font-sans:  'Outfit', system-ui, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-mono:  'DM Mono', 'Fira Code', monospace;
+}
+
+/* ═══════════════════════════════════════════
+   BASE STYLES
+═══════════════════════════════════════════ */
+@layer base {
+  * {
+    box-sizing: border-box;
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-weight: 300;
+  }
+
+  body {
+    background: #0c0c0a;
+    color: #e8e6df;
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2e2e28; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a32; }
+  * { scrollbar-width: thin; scrollbar-color: #2e2e28 transparent; }
+}
+
+/* ═══════════════════════════════════════════
+   NEXUS UTILITIES
+═══════════════════════════════════════════ */
+@layer utilities {
+  .font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .font-code    { font-family: 'DM Mono', monospace; }
+
+  /* Gold glow */
+  .gold-glow    { box-shadow: 0 0 20px rgba(201,168,76,0.15); }
+  .gold-glow-sm { box-shadow: 0 0 8px rgba(201,168,76,0.12); }
+
+  /* nx-card — pixel-perfect match to HTML .card */
+  .nx-card {
+    background: #141410;
+    border: 1px solid #222220;
+    border-radius: 10px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .nx-card:hover { border-color: #2e2e28; }
+  .nx-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.015) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Badge variants */
+  .nx-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 9.5px;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .nx-badge-green  { background: rgba(76,175,122,0.1);  color: #4caf7a; }
+  .nx-badge-red    { background: rgba(201,80,76,0.1);   color: #c9504c; }
+  .nx-badge-blue   { background: rgba(76,122,201,0.1);  color: #4c7ac9; }
+  .nx-badge-amber  { background: rgba(201,144,76,0.1);  color: #c9904c; }
+  .nx-badge-gold   { background: rgba(201,168,76,0.08); color: #c9a84c; }
+  .nx-badge-purple { background: rgba(156,108,201,0.1); color: #9c6cc9; }
+
+  /* Divider */
+  .nx-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #c9a84c, transparent);
+    opacity: 0.15;
+    margin: 14px 0;
+  }
+
+  /* Progress bar */
+  .nx-bar-track { height: 3px; background: #222220; border-radius: 2px; overflow: hidden; }
+  .nx-bar-fill  { height: 100%; border-radius: 2px; background: #c9a84c; }
+}
