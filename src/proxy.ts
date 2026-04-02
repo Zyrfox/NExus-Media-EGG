@@ -42,14 +42,18 @@ export default async function proxy(request: NextRequest) {
   if (!user && !isPublic) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    return NextResponse.redirect(url)
+    const res = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach(c => res.cookies.set(c))
+    return res
   }
 
   // Authenticated on login page → dashboard
   if (user && pathname === '/login') {
     const url = request.nextUrl.clone()
     url.pathname = '/'
-    return NextResponse.redirect(url)
+    const res = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach(c => res.cookies.set(c))
+    return res
   }
 
   return supabaseResponse
