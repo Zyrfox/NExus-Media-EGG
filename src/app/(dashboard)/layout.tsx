@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import { Sidebar } from '@/components/shared/Sidebar'
 import type { Profile } from '@/types'
 
@@ -14,8 +15,9 @@ export default async function DashboardLayout({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Fetch profile
-  const { data: profileData } = await supabase
+  // Fetch profile using service client to bypass RLS
+  const service = createServiceClient()
+  const { data: profileData } = await service
     .from('profiles')
     .select('*, outlet:outlets(*)')
     .eq('id', user.id)
@@ -29,8 +31,8 @@ export default async function DashboardLayout({
 
   const profile = profileData as Profile
 
-  // Fetch unread notification count
-  const { count: unreadCount } = await supabase
+  // Fetch unread notification count using service client
+  const { count: unreadCount } = await service
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
