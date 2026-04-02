@@ -1,13 +1,14 @@
 'use client'
 
 import { useActionState } from 'react'
-import { signIn, type AuthState } from '@/lib/actions/auth'
+import { signIn, signInAsGuest, type AuthState } from '@/lib/actions/auth'
 import { Loader2 } from 'lucide-react'
 
 const initialState: AuthState = { error: '' }
 
 export default function LoginPage() {
-  const [state, formAction, isPending] = useActionState<AuthState, FormData>(signIn, initialState)
+  const [state,      formAction,      isPending]      = useActionState<AuthState, FormData>(signIn,        initialState)
+  const [guestState, guestFormAction, isGuestPending] = useActionState<AuthState, FormData>(signInAsGuest, initialState)
 
   return (
     <div
@@ -173,9 +174,46 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {/* Gold divider */}
+        <div className="nx-divider mt-6 mb-5" />
+
+        {/* Guest login */}
+        <form action={guestFormAction}>
+          <button
+            type="submit"
+            disabled={isGuestPending || isPending}
+            className="flex items-center justify-center gap-2 w-full rounded-md transition-all"
+            style={{
+              padding:    '9px 16px',
+              background: 'transparent',
+              color:      isGuestPending ? '#3a3a32' : '#5a5650',
+              fontSize:   '12px',
+              fontFamily: 'Outfit, sans-serif',
+              cursor:     (isGuestPending || isPending) ? 'not-allowed' : 'pointer',
+              border:     '1px solid #222220',
+            }}
+            onMouseEnter={(e) => { if (!isGuestPending && !isPending) (e.currentTarget as HTMLButtonElement).style.color = '#a09a8e' }}
+            onMouseLeave={(e) => { if (!isGuestPending && !isPending) (e.currentTarget as HTMLButtonElement).style.color = '#5a5650' }}
+          >
+            {isGuestPending ? (
+              <>
+                <Loader2 size={13} className="animate-spin" />
+                Memuat...
+              </>
+            ) : (
+              'Masuk sebagai Tamu'
+            )}
+          </button>
+          {guestState?.error && (
+            <p style={{ fontSize: '11px', color: '#c9504c', textAlign: 'center', marginTop: '6px', fontFamily: 'DM Mono, monospace' }}>
+              {guestState.error}
+            </p>
+          )}
+        </form>
+
         {/* Footer */}
         <p
-          className="text-center mt-6 font-code"
+          className="text-center mt-5 font-code"
           style={{ fontSize: '10px', color: '#3a3a32', letterSpacing: '0.06em' }}
         >
           NEXUS MEDIA v1.0 · Easy Going Group © 2026
