@@ -39,13 +39,15 @@ export async function signInAsGuest(
   _prevState: AuthState,
   _formData: FormData
 ): Promise<AuthState> {
-  // Ensure guest user exists via admin API (idempotent)
   const service = createServiceClient()
-  const { data: listData } = await service.auth.admin.listUsers()
-  const guestExists = listData?.users?.some(u => u.email === GUEST_EMAIL)
 
-  if (!guestExists) {
-    const { data: newUser, error: createErr } = await service.auth.admin.createUser({
+  // Ensure guest user exists (idempotent)
+  const { data: listData } = await service.auth.admin.listUsers()
+  const guestUser = listData?.users?.find(u => u.email === GUEST_EMAIL)
+
+  if (!guestUser) {
+    // Create via admin API — trigger auto-creates profile + outlet assignment
+    const { error: createErr } = await service.auth.admin.createUser({
       email: GUEST_EMAIL,
       password: GUEST_PASSWORD,
       email_confirm: true,
@@ -54,28 +56,15 @@ export async function signInAsGuest(
     if (createErr) {
       return { error: 'Gagal membuat akun tamu.' }
     }
-    // Create profile + outlet assignment
-    if (newUser?.user) {
-      const { data: outlets } = await service.from('outlets').select('id').limit(1).single()
-      const outletId = outlets?.id
-      if (outletId) {
-        await service.from('profiles').upsert({
-          id: newUser.user.id,
-          outlet_id: outletId,
-          full_name: 'Guest User',
-          role: 'guest',
-          is_active: true,
-        })
-        await service.from('user_outlet_assignments').upsert({
-          user_id: newUser.user.id,
-          outlet_id: outletId,
-          role: 'guest',
-        })
-      }
+    // Update role to 'guest' (trigger defaults to 'staff_media')
+    const { data: created } = await service.auth.admin.listUsers()
+    const guest = created?.users?.find(u => u.email === GUEST_EMAIL)
+    if (guest) {
+      await service.from('profiles').update({ role: 'guest' }).eq('id', guest.id)
     }
   }
 
-  // Sign in as guest
+  // Sign in
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({
     email: GUEST_EMAIL,
