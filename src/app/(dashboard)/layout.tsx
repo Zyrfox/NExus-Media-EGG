@@ -21,7 +21,11 @@ export default async function DashboardLayout({
     .eq('id', user.id)
     .single()
 
-  if (!profileData) redirect('/login')
+  if (!profileData) {
+    // No profile = invalid account state → sign out to break redirect loop
+    await supabase.auth.signOut()
+    redirect('/login')
+  }
 
   const profile = profileData as Profile
 
