@@ -251,6 +251,153 @@ export type Database = {
           }
         ]
       }
+      content_cards: {
+        Row: {
+          id: string
+          outlet_id: string
+          title: string
+          description: string | null
+          status: string
+          type: string
+          target_platform: string
+          scheduled_date: string | null
+          published_date: string | null
+          created_by: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          outlet_id: string
+          title: string
+          description?: string | null
+          status?: string
+          type: string
+          target_platform?: string
+          scheduled_date?: string | null
+          published_date?: string | null
+          created_by: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          outlet_id?: string
+          title?: string
+          description?: string | null
+          status?: string
+          type?: string
+          target_platform?: string
+          scheduled_date?: string | null
+          published_date?: string | null
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'content_cards_outlet_id_fkey'
+            columns: ['outlet_id']
+            isOneToOne: false
+            referencedRelation: 'outlets'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'content_cards_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      content_ideas: {
+        Row: {
+          id: string
+          outlet_id: string
+          title: string
+          description: string | null
+          status: string
+          votes: number
+          suggested_by: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          outlet_id: string
+          title: string
+          description?: string | null
+          status?: string
+          votes?: number
+          suggested_by: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          outlet_id?: string
+          title?: string
+          description?: string | null
+          status?: string
+          votes?: number
+          suggested_by?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'content_ideas_outlet_id_fkey'
+            columns: ['outlet_id']
+            isOneToOne: false
+            referencedRelation: 'outlets'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'content_ideas_suggested_by_fkey'
+            columns: ['suggested_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      idea_votes: {
+        Row: {
+          id: string
+          idea_id: string
+          user_id: string
+          voted_at: string
+        }
+        Insert: {
+          id?: string
+          idea_id: string
+          user_id: string
+          voted_at?: string
+        }
+        Update: {
+          id?: string
+          idea_id?: string
+          user_id?: string
+          voted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'idea_votes_idea_id_fkey'
+            columns: ['idea_id']
+            isOneToOne: false
+            referencedRelation: 'content_ideas'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'idea_votes_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
+      }
       user_xp: {
         Row: {
           id: string
