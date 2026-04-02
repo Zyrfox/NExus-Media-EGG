@@ -34,14 +34,22 @@ export async function proxy(request: NextRequest) {
   if (!user && !pathname.startsWith('/login') && !pathname.startsWith('/api/auth')) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    return NextResponse.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach(cookie => {
+      redirectResponse.cookies.set(cookie)
+    })
+    return redirectResponse
   }
 
   // Authenticated → redirect away from login
   if (user && pathname.startsWith('/login')) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
-    return NextResponse.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach(cookie => {
+      redirectResponse.cookies.set(cookie)
+    })
+    return redirectResponse
   }
 
   return supabaseResponse
